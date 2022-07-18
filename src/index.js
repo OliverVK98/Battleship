@@ -77,23 +77,22 @@ for (let i = 0; i < 10; i++) {
 }
 
 //Function that display AI Board after player places his ships
-const buildBoards = () => {
+const showAIBoard = () => {
     gameBoardAI.classList.remove('hidden');
 }
 
 // Function that will add ships to the player's board at the beggining of the game, later passed in the EventListener 
 const addShips = (event) => {
     if (!getShipClass(event.target) && ifCanFit(event, playerLengthArr[0])) {
-        if (playerLengthArr[0] != undefined) {
-            let x = Number(event.target.className.slice(2, 3));
-            let y = Number(event.target.className.slice(6, 7));
-            const testShip = new Ship(x, y, playerLengthArr[0]);
-            testShip.updateShip();
-            playerLengthArr.shift();
-            playerShipArray.push(testShip);
-        } else {
+        let x = Number(event.target.className.slice(2, 3));
+        let y = Number(event.target.className.slice(6, 7));
+        const testShip = new Ship(x, y, playerLengthArr[0]);
+        testShip.updateShip();
+        playerLengthArr.shift();
+        playerShipArray.push(testShip);
+        if (playerLengthArr[0] === undefined) {
             gameBoard.removeEventListener('click', addShips);
-            buildBoards();
+            showAIBoard();
         }
     }
 }
