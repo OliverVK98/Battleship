@@ -140,10 +140,26 @@ table {
 
 /* START OF CSS */
 
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    gap: 10vw;
+}
+
 #gameBoard {
     display: flex;
-    width: 50vw;
-    height: 50vh;
+    width: 37%;
+    height: 37%;
+    flex-wrap: wrap;
+}
+
+#gameBoardAI {
+    display: flex;
+    width: 37%;
+    height: 37%;
     flex-wrap: wrap;
 }
 
@@ -158,4 +174,8 @@ button {
 
 .shipHit {
     background-color: red;
+}
+
+.hidden {
+    display: none !important;
 }
