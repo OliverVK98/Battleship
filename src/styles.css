@@ -163,9 +163,13 @@ body {
     flex-wrap: wrap;
 }
 
-button {
+.pDiv,
+.aiDiv {
     width: 10%;
     height: 10%;
+    background-color: rgb(211, 213, 211);
+    border: 1px solid black;
+    box-sizing: border-box;
 }
 
 .ship {

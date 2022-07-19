@@ -3,6 +3,7 @@ import getClass from "./getElementClass.js";
 import getShipClass from './getShipClass';
 import compareArr from './compareArr';
 import ifCanFit from './ifCanFit';
+import buildArrays from './buildArrays';
 
 class Ship {
     constructor(x, y, length) {
@@ -52,38 +53,11 @@ const playerLengthArr = [5, 4, 4, 3, 3];
 const playerShipArray = [];
 const AIShipArray = [];
 
-for (let i = 0; i < 10; i++) {
-    let rowArr = [];
-    for (let k = 0; k < 10; k++) {
-        let newButton = document.createElement('button');
-        gameBoard.appendChild(newButton);
-        newButton.classList.add(`px${k}`);
-        newButton.classList.add(`py${i}`);
-        rowArr.push(newButton);
-    }
-    gameBoardArr.push(rowArr);
-}
-
-for (let i = 0; i < 10; i++) {
-    let rowArr = [];
-    for (let k = 0; k < 10; k++) {
-        let newButton = document.createElement('button');
-        gameBoardAI.appendChild(newButton);
-        newButton.classList.add(`ax${k}`);
-        newButton.classList.add(`ay${k}`);
-        rowArr.push(newButton);
-    }
-    gameBoardAIArr.push(rowArr);
-}
-
-//Function that display AI Board after player places his ships
-const showAIBoard = () => {
-    gameBoardAI.classList.remove('hidden');
-}
+buildArrays(gameBoardArr, gameBoardAIArr);
 
 // Function that will add ships to the player's board at the beggining of the game, later passed in the EventListener 
 const addShips = (event) => {
-    if (!getShipClass(event.target) && ifCanFit(event, playerLengthArr[0])) {
+    if (!getShipClass(event.target) && ifCanFit(event, playerLengthArr[0], playerShipArray)) {
         let x = Number(event.target.className.slice(2, 3));
         let y = Number(event.target.className.slice(6, 7));
         const testShip = new Ship(x, y, playerLengthArr[0]);
@@ -92,7 +66,7 @@ const addShips = (event) => {
         playerShipArray.push(testShip);
         if (playerLengthArr[0] === undefined) {
             gameBoard.removeEventListener('click', addShips);
-            showAIBoard();
+            gameBoardAI.classList.remove('hidden');
         }
     }
 }
