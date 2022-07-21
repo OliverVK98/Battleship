@@ -43,6 +43,15 @@ class Ship {
             gameBoardArr[this.yCord][this.xCordHit[i]].classList.add('shipHit');
         }
     }
+
+    updateShipAI() {
+        for (let i = 0; i < this.xCord.length; i++) {
+            gameBoardAIArr[this.yCord][this.xCord[i]].classList.add('ship');
+        }
+        for (let i = 0; i < this.xCordHit.length; i++) {
+            gameBoardAIArr[this.yCord][this.xCordHit[i]].classList.add('shipHit');
+        }
+    }
 }
 
 const gameBoard = document.getElementById('gameBoard');
@@ -50,28 +59,101 @@ const gameBoardAI = document.getElementById('gameBoardAI');
 const gameBoardArr = [];
 const gameBoardAIArr = [];
 const playerLengthArr = [5, 4, 4, 3, 3];
+const AILengthArr = [5, 4, 4, 3, 3];
 const playerShipArray = [];
 const AIShipArray = [];
 
 buildArrays(gameBoardArr, gameBoardAIArr);
 
+function buildAIShips() {
+    const x = Math.floor(Math.random(0, 1) * 10);
+    const y = Math.floor(Math.random(0, 1) * 10);
+    if (AILengthArr[0] === undefined) return;
+
+    if (ifCanFit(gameBoardAIArr[y][x], AILengthArr[0], AIShipArray)) {
+        const newShip = new Ship(x, y, AILengthArr[0]);
+        AIShipArray.push(newShip);
+        newShip.updateShipAI();
+        AILengthArr.shift();
+    }
+    buildAIShips();
+
+}
+buildAIShips()
+console.log(AIShipArray);
+
 // Function that will add ships to the player's board at the beggining of the game, later passed in the EventListener 
 const addShips = (event) => {
-    if (!getShipClass(event.target) && ifCanFit(event, playerLengthArr[0], playerShipArray)) {
+    if (event.target.style.cursor != 'not-allowed') {
+        gameBoard.removeEventListener('mouseover', cursorNotAllowed);
         let x = Number(event.target.className.slice(2, 3));
         let y = Number(event.target.className.slice(6, 7));
-        const testShip = new Ship(x, y, playerLengthArr[0]);
-        testShip.updateShip();
+        const newShip = new Ship(x, y, playerLengthArr[0]);
+        newShip.updateShip();
         playerLengthArr.shift();
-        playerShipArray.push(testShip);
+        gameBoard.addEventListener('mouseover', cursorNotAllowed);
+        playerShipArray.push(newShip);
         if (playerLengthArr[0] === undefined) {
             gameBoard.removeEventListener('click', addShips);
+            gameBoard.removeEventListener('mouseover', cursorNotAllowed);
             gameBoardAI.classList.remove('hidden');
         }
     }
 }
 
+const cursorNotAllowed = (event) => {
+    for (let i = 0; i < 10; i++) {
+        for (let k = 0; k < 10; k++) {
+            gameBoardArr[i][k].style.cursor = 'pointer';
+            if (gameBoardArr[i][k].style.backgroundColor != 'beige') gameBoardArr[i][k].style.backgroundColor = 'rgb(211, 213, 211)'
+        }
+    }
+
+    let x = Number(event.target.className.slice(2, 3));
+    let y = Number(event.target.className.slice(6, 7));
+    const arrCheck = [];
+    let shipCheck = 0;
+    let num = 0;
+
+    for (let i = 0; i < playerLengthArr[0]; i++) {
+        arrCheck.push(num);
+        num++;
+    }
+
+    arrCheck.forEach((index) => {
+        if (gameBoardArr[y][x + index] === undefined) gameBoardArr[y][x].style.cursor = 'not-allowed';
+    })
+
+    if (event.target.style.cursor != 'not-allowed') {
+        arrCheck.forEach((index) => {
+            if (gameBoardArr[y][x + arrCheck[arrCheck.length - 1]]) {
+                if (getShipClass(gameBoardArr[y][x + index])) shipCheck++;
+                if (shipCheck > 0) arrCheck.forEach((index) => {
+                    if (gameBoardArr[y][x + index]) gameBoardArr[y][x + index].style.cursor = 'not-allowed'
+                })
+            }
+        })
+    }
+
+    if (event.target.style.cursor != 'not-allowed') {
+        arrCheck.forEach((index) => {
+            if (gameBoardArr[y][x + index]) gameBoardArr[y][x + index].style.backgroundColor = 'rgb(0,166,147)';
+        })
+    } else arrCheck.forEach((index) => {
+        if (gameBoardArr[y][x + index]) gameBoardArr[y][x + index].style.backgroundColor = 'rgb(230,27,35)';
+    })
+}
+
+gameBoard.addEventListener('mouseover', cursorNotAllowed);
 gameBoard.addEventListener('click', addShips);
+
+
+
+
+
+
+
+
 
 // gameBoard.addEventListener('click', (e) => {
 //     // playerShipArray.forEach((element) = {
