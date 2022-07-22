@@ -4,6 +4,8 @@ import getShipClass from './getShipClass';
 import compareArr from './compareArr';
 import ifCanFit from './ifCanFit';
 import buildArrays from './buildArrays';
+import getIfWasHitBefore from './getIfWasHitBefore';
+import checkWinner from './checkWinner';
 
 class Ship {
     constructor(x, y, length) {
@@ -23,10 +25,13 @@ class Ship {
 
     isHit(x, y) {
         if (y === this.yCord) {
-            if (this.xCord.includes(x)) this.xCordHit.push(x);
-            this.isSunk();
-            return true;
+            if (this.xCord.includes(x)) {
+                this.xCordHit.push(x);
+                this.isSunk();
+                return true;
+            } else return false;
         }
+        return false;
     }
 
     isSunk() {
@@ -42,14 +47,26 @@ class Ship {
         for (let i = 0; i < this.xCordHit.length; i++) {
             gameBoardArr[this.yCord][this.xCordHit[i]].classList.add('shipHit');
         }
+
+        if (this.sunk) {
+            for (let i = 0; i < this.xCord.length; i++) {
+                gameBoardArr[this.yCord][this.xCord[i]].classList.add('sunk');
+            }
+        }
     }
 
     updateShipAI() {
         for (let i = 0; i < this.xCord.length; i++) {
-            gameBoardAIArr[this.yCord][this.xCord[i]].classList.add('ship');
+            gameBoardAIArr[this.yCord][this.xCord[i]].classList.add('AIShip');
         }
         for (let i = 0; i < this.xCordHit.length; i++) {
             gameBoardAIArr[this.yCord][this.xCordHit[i]].classList.add('shipHit');
+        }
+
+        if (this.sunk) {
+            for (let i = 0; i < this.xCord.length; i++) {
+                gameBoardAIArr[this.yCord][this.xCord[i]].classList.add('sunk');
+            }
         }
     }
 }
@@ -79,10 +96,46 @@ function buildAIShips() {
     buildAIShips();
 
 }
-buildAIShips()
-console.log(AIShipArray);
 
-// Function that will add ships to the player's board at the beggining of the game, later passed in the EventListener 
+const startGameAI = event => {
+    if (!event.target.className.includes('shipHit') && !event.target.className.includes('missHit') && !event.target.className.includes('sunk')) {
+        let x = Number(event.target.className.slice(2, 3));
+        let y = Number(event.target.className.slice(6, 7));
+        let shipWasHit = false;
+        AIShipArray.forEach(ship => {
+            if (ship.isHit(x, y)) {
+                ship.updateShipAI()
+                shipWasHit = true;
+            }
+        })
+
+        if (!shipWasHit) {
+            event.target.classList.add('missHit');
+        }
+        gameBoardAI.removeEventListener('click', startGameAI)
+        startGameP();
+    }
+}
+
+const startGameP = () => {
+    if (checkWinner(playerShipArray, AIShipArray)) { console.log('Player Won!'); return; }
+    const x = Math.floor(Math.random(0, 1) * 10);
+    const y = Math.floor(Math.random(0, 1) * 10);
+    let shipWasHit = false;
+    if (getIfWasHitBefore(gameBoardArr[y][x])) startGameP()
+    else {
+        playerShipArray.forEach(ship => {
+            if (ship.isHit(x, y)) {
+                ship.updateShip()
+                shipWasHit = true
+            }
+        })
+        if (!shipWasHit) gameBoardArr[y][x].classList.add('missHit');
+        if (checkWinner(playerShipArray, AIShipArray)) { console.log('AI Won!'); return; }
+        gameBoardAI.addEventListener('click', startGameAI);
+    }
+}
+
 const addShips = (event) => {
     if (event.target.style.cursor != 'not-allowed') {
         gameBoard.removeEventListener('mouseover', cursorNotAllowed);
@@ -97,6 +150,8 @@ const addShips = (event) => {
             gameBoard.removeEventListener('click', addShips);
             gameBoard.removeEventListener('mouseover', cursorNotAllowed);
             gameBoardAI.classList.remove('hidden');
+            buildAIShips();
+            gameBoardAI.addEventListener('click', startGameAI)
         }
     }
 }

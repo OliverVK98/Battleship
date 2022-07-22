@@ -17,18 +17,18 @@ function ifCanFit(element, length, shipArray) {
     if (shipArray.length != 0) {
         shipArray.forEach(ship => {
             if (y === ship.yCord) {
-                for (let i = 0; i < length; i++) {
-                    // console.log(ship.xCord.includes(x + i));
+                for (let i = 0; i <= length; i++) {
                     if (ship.xCord.includes(x + i)) answer = false;
                 }
             }
         });
     }
 
+    if (answer === false) return answer;
+
 
     if (x < (10 - length)) answer = true
     else answer = false;
-    console.log(answer);
     return answer;
 }
 

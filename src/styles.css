@@ -176,10 +176,22 @@ body {
     background-color: beige !important;
 }
 
+.AIShip {
+    background-color: rgb(211, 213, 211);
+}
+
 .shipHit {
-    background-color: red;
+    background-color: red !important;
+}
+
+.missHit {
+    background-color: aqua !important;
 }
 
 .hidden {
     display: none !important;
+}
+
+.sunk {
+    background-color: black !important;
 }
